@@ -25,7 +25,7 @@
     <script src="https://js.arcgis.com/4.14/"></script>
 
     <script>
-      require(["esri/Map", "esri/views/MapView", "esri/layers/GeoJSONLayer"], function(Map, MapView, GeoJSONLayer) {
+      require(["esri/Map", "esri/views/MapView", "esri/layers/GeoJSONLayer", "esri/widgets/LayerList"], function(Map, MapView, GeoJSONLayer, LayerList) {
         var map = new Map({
           basemap: "topo"
         });
@@ -37,10 +37,26 @@
           center: [56, 54] // longitude, latitude
         });
       
-		const geoJSONLayer = new GeoJSONLayer({
+		const citylayer = new GeoJSONLayer({
 		url: "https://agerasx.github.io/city.geojson",
+        title: "City Bashkortostan"
 		});
-		map.add(geoJSONLayer);
+
+        const bashlayer = new GeoJSONLayer({
+          url: "https://agerasx.github.io/bash.geojson",
+          title: "Bashkortostan Rayons"
+        });
+
+		map.add(citylayer, bashlayer);
+
+        view.when(function() {
+          var layerList = new LayerList({
+            view: view
+          });
+
+          // Add widget to the top right corner of the view
+          view.ui.add(layerList, "top-right");
+        });
 	  });
     </script>
   </head>
