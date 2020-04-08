@@ -74,16 +74,16 @@
           renderer: renderer
         });
 
-        const bashlayer = new GeoJSONLayer({
-            url: "https://agerasx.github.io/bash.geojson",
-            title: "Bashkortostan Rayons"
+        const raynlayer = new GeoJSONLayer({
+            url: "https://agerasx.github.io/rayn.geojson",
+            title: "Rayons"
         });
 
 
 
         var map = new Map({
           basemap: "topo",
-          layers: [citylayer, bashlayer]
+          layers: [citylayer, raynlayer]
         });
 
         var view = new MapView({
