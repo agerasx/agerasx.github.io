@@ -67,6 +67,17 @@
               ]
           };
 
+        const renderer2 = {
+          type: "simple",
+          symbol: {
+            type: "simple-fill",
+            outline: {
+              color: "lightgray",
+              width: 0.5
+            }
+          }
+        };
+
         const citylayer = new GeoJSONLayer({
           url: "https://agerasx.github.io/city.geojson",
           title: "City Bashkortostan",
@@ -76,14 +87,17 @@
 
         const raynlayer = new GeoJSONLayer({
             url: "https://agerasx.github.io/rayn.geojson",
-            title: "Rayons"
+            title: "Rayons",
+            renderer: renderer2
         });
+
+        raynlayer.opacity = 0.5;
 
 
 
         var map = new Map({
           basemap: "topo",
-          layers: [citylayer, raynlayer]
+          layers: [raynlayer, citylayer]
         });
 
         var view = new MapView({
