@@ -26,8 +26,64 @@
 
     <script>
       require(["esri/Map", "esri/views/MapView", "esri/layers/GeoJSONLayer", "esri/widgets/LayerList"], function(Map, MapView, GeoJSONLayer, LayerList) {
+        const template = {
+            title: "Населенный пункт",
+            content: "Регион {A_RGN}, Район {A_DSTRCT}, Нас. пункт {NAME}"
+            //     ,fieldInfos: [
+            //     {
+            //         fieldName: "time",
+            //         format: {
+            //             dateFormat: "short-date-short-time"
+            //         }
+            //     }
+            // ]
+        };
+
+          const renderer = {
+              type: "simple",
+              field: "POPULATION",
+              symbol: {
+                  type: "simple-marker",
+                  color: "orange",
+                  outline: {
+                      color: "white"
+                  }
+              },
+              visualVariables: [
+                  {
+                      type: "size",
+                      field: "POPULATION",
+                      stops: [
+                          {
+                              value: 10000,
+                              size: "4px"
+                          },
+                          {
+                              value: 100000,
+                              size: "10px"
+                          }
+                      ]
+                  }
+              ]
+          };
+
+        const citylayer = new GeoJSONLayer({
+          url: "https://agerasx.github.io/city.geojson",
+          title: "City Bashkortostan",
+          popupTemplate: template,
+          renderer: renderer
+        });
+
+        const bashlayer = new GeoJSONLayer({
+            url: "https://agerasx.github.io/bash.geojson",
+            title: "Bashkortostan Rayons"
+        });
+
+
+
         var map = new Map({
-          basemap: "topo"
+          basemap: "topo",
+          layers: [citylayer, bashlayer]
         });
 
         var view = new MapView({
@@ -37,24 +93,13 @@
           center: [56, 54] // longitude, latitude
         });
       
-		const citylayer = new GeoJSONLayer({
-		url: "https://agerasx.github.io/city.geojson",
-        title: "City Bashkortostan"
-		});
 
-        const bashlayer = new GeoJSONLayer({
-          url: "https://agerasx.github.io/bash.geojson",
-          title: "Bashkortostan Rayons"
-        });
 
-		map.add(citylayer, bashlayer);
 
         view.when(function() {
           var layerList = new LayerList({
             view: view
           });
-
-          // Add widget to the top right corner of the view
           view.ui.add(layerList, "top-right");
         });
 	  });
