@@ -25,7 +25,9 @@
     <script src="https://js.arcgis.com/4.14/"></script>
 
     <script>
-      require(["esri/Map", "esri/views/MapView", "esri/layers/GeoJSONLayer", "esri/widgets/LayerList"], function(Map, MapView, GeoJSONLayer, LayerList) {
+      require(["esri/Map", "esri/views/MapView", "esri/layers/GeoJSONLayer", "esri/layers/FeatureLayer", "esri/widgets/LayerList", "esri/tasks/support/Query"], function(Map, MapView, GeoJSONLayer, FeatureLayer, LayerList, Query) {
+
+        //Создать стиль Popup's
         const template = {
             title: "Населенный пункт",
             content: "<p> <b> Регион: </b>{A_RGN} </p>  <p> <b> Район: </b> {A_DSTRCT} </p> <b>Нас. пункт: </b>{NAME}"
@@ -39,6 +41,7 @@
             // ]
         };
 
+          //Создать стиль отображения точек по населению
           const renderer = {
               type: "simple",
               field: "POPULATION",
@@ -67,6 +70,7 @@
               ]
           };
 
+        //Создать стиль отображения полигонов
         const renderer2 = {
           type: "simple",
           symbol: {
@@ -78,6 +82,7 @@
           }
         };
 
+        //Загрузка слоев с применением стилей
         const citylayer = new GeoJSONLayer({
           url: "https://agerasx.github.io/city.geojson",
           title: "City Bashkortostan",
@@ -91,25 +96,33 @@
             renderer: renderer2
         });
 
+        //Прозрачность слоя 50%
         raynlayer.opacity = 0.5;
 
+        //Пробую загрузить данные
+        const data = new FeatureLayer({
+          url: "https://agerasx.github.io/data/data.json"
+        });
 
-
+        //Загрузка карты-подложки
         var map = new Map({
           basemap: "topo",
           layers: [raynlayer, citylayer]
         });
 
+        //Настройка отображения стартового вида
         var view = new MapView({
           container: "viewDiv",
           map: map,
           zoom: 7,
           center: [56, 54] // longitude, latitude
         });
-      
 
 
 
+
+
+        //Добавление виджета слоев
         view.when(function() {
           var layerList = new LayerList({
             view: view
