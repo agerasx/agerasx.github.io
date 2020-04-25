@@ -25,7 +25,15 @@
     <script src="https://js.arcgis.com/4.14/"></script>
 
     <script>
-      require(["esri/Map", "esri/views/MapView", "esri/layers/GeoJSONLayer", "esri/layers/FeatureLayer", "esri/widgets/LayerList", "esri/tasks/support/Query"], function(Map, MapView, GeoJSONLayer, FeatureLayer, LayerList, Query) {
+      require(["esri/Map",
+        "esri/views/MapView",
+        "esri/layers/GeoJSONLayer",
+        "esri/layers/FeatureLayer",
+        "esri/widgets/LayerList",
+        "esri/tasks/support/Query",
+        "esri/request",
+        "esri/renderers/HeatmapRenderer"],
+              function(Map, MapView, GeoJSONLayer, FeatureLayer, LayerList, Query, esriRequest, HeatmapRenderer) {
 
         //Создать стиль Popup's
         const template = {
@@ -42,11 +50,38 @@
         };
 
           //Создать стиль отображения точек по населению
-          const renderer = {
+          // const renderer = {
+          //     type: "simple",
+          //     symbol: {
+          //         type: "simple-marker",
+          //         color: "orange",
+          //         outline: {
+          //             color: "white"
+          //         }
+          //     },
+          //     visualVariables: [
+          //         {
+          //             type: "size",
+          //             field: "POPULATION",
+          //             stops: [
+          //                 {
+          //                     value: 10000,
+          //                     size: "4px"
+          //                 },
+          //                 {
+          //                     value: 100000,
+          //                     size: "10px"
+          //                 }
+          //             ]
+          //         }
+          //     ]
+          // };
+
+        const renderer = {
               type: "simple",
-              field: "POPULATION",
               symbol: {
                   type: "simple-marker",
+                  size: "2px",
                   color: "orange",
                   outline: {
                       color: "white"
@@ -55,16 +90,21 @@
               visualVariables: [
                   {
                       type: "size",
-                      field: "POPULATION",
+                      field: "Cloud05",
+                      minValue: 0,
                       stops: [
                           {
-                              value: 10000,
+                              value: 6,
                               size: "4px"
                           },
                           {
-                              value: 100000,
+                              value: 7,
                               size: "10px"
-                          }
+                          },
+                        {
+                          value: 0,
+                          size: "1px"
+                        }
                       ]
                   }
               ]
@@ -100,14 +140,39 @@
         raynlayer.opacity = 0.5;
 
         //Пробую загрузить данные
-        const data = new FeatureLayer({
-          url: "https://agerasx.github.io/data/data.json"
-        });
+        // const data = new FeatureLayer({
+        //   url: "https://agerasx.github.io/data/data.json"
+        // });
+        function loadLayerWithData(url) {
+          Promise.all([
+            esriRequest("https://agerasx.github.io/city.geojson", {responseType: "json"}),
+            esriRequest(url, {responseType: "json"}),
+          ]).then(function(responses){
+            var geoJson = responses[0].data;
+            var jsonData = responses[1].data;
+            const features = geoJson.features;
+            jsonData.forEach((obj) => {
+              features.filter(f => {
+                return f.properties["A_DSTRCT"] === obj["Area"]
+                        && f.properties["A_RGN"] === obj["Region"]
+                        && f.properties["NAME"] === obj["Locality"]
+              }).forEach(f => {
+                f.properties = {...obj, ...f.properties};
+              })
+            });
+            const blob = new Blob([JSON.stringify(geoJson)], {type: "application/json"});
+            const url  = URL.createObjectURL(blob);
+            const layer = new GeoJSONLayer({ url : url, renderer: renderer});
+            map.add(layer);
+          });
+        }
+        loadLayerWithData("https://agerasx.github.io/data/data.json")
+
 
         //Загрузка карты-подложки
         var map = new Map({
           basemap: "topo",
-          layers: [raynlayer, citylayer]
+          layers: [raynlayer]
         });
 
         //Настройка отображения стартового вида
