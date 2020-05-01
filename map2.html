@@ -32,83 +32,104 @@
         "esri/widgets/LayerList",
         "esri/tasks/support/Query",
         "esri/request",
-        "esri/renderers/HeatmapRenderer"],
-              function(Map, MapView, GeoJSONLayer, FeatureLayer, LayerList, Query, esriRequest, HeatmapRenderer) {
+        "esri/renderers/HeatmapRenderer",
+        "esri/widgets/Legend"],
+              function(Map, MapView, GeoJSONLayer, FeatureLayer, LayerList, Query, esriRequest, HeatmapRenderer, Legend) {
 
         //Создать стиль Popup's
         const template = {
             title: "Населенный пункт",
             content: "<p> <b> Регион: </b>{A_RGN} </p>  <p> <b> Район: </b> {A_DSTRCT} </p> <b>Нас. пункт: </b>{NAME}"
-            //     ,fieldInfos: [
-            //     {
-            //         fieldName: "time",
-            //         format: {
-            //             dateFormat: "short-date-short-time"
-            //         }
-            //     }
-            // ]
         };
 
-          //Создать стиль отображения точек по населению
-          // const renderer = {
-          //     type: "simple",
-          //     symbol: {
-          //         type: "simple-marker",
-          //         color: "orange",
-          //         outline: {
-          //             color: "white"
-          //         }
-          //     },
-          //     visualVariables: [
-          //         {
-          //             type: "size",
-          //             field: "POPULATION",
-          //             stops: [
-          //                 {
-          //                     value: 10000,
-          //                     size: "4px"
-          //                 },
-          //                 {
-          //                     value: 100000,
-          //                     size: "10px"
-          //                 }
-          //             ]
-          //         }
-          //     ]
-          // };
+                // const template = {
+                //   title: "Информация",
+                //   content: "Температура в 17 часов {Temperature_17}."
+                // };
 
-        const renderer = {
+          //Создать стиль отображения точек по населению
+          const renderer1 = {
               type: "simple",
               symbol: {
                   type: "simple-marker",
+                  color: "white",
                   size: "2px",
-                  color: "orange",
                   outline: {
-                      color: "white"
+                      color: "gray"
                   }
               },
               visualVariables: [
                   {
                       type: "size",
-                      field: "Cloud05",
-                      minValue: 0,
+                      field: "POPULATION",
                       stops: [
                           {
-                              value: 6,
+                              value: 10000,
                               size: "4px"
                           },
                           {
-                              value: 7,
+                              value: 100000,
                               size: "10px"
-                          },
-                        {
-                          value: 0,
-                          size: "1px"
-                        }
+                          }
                       ]
                   }
               ]
           };
+
+        // const renderer = {
+        //       type: "simple",
+        //       symbol: {
+        //           type: "simple-marker",
+        //           size: "2px",
+        //           color: "white",
+        //           outline: {
+        //               color: "gray"
+        //           }
+        //       },
+        //       visualVariables: [
+        //           {
+        //               type: "size",
+        //               field: "Temperature_17",
+        //               stops: [
+        //                   {
+        //                       value: 0,
+        //                       size: "4px"
+        //                   },
+        //                   {
+        //                       value: 5,
+        //                       size: "10px"
+        //                   },
+        //                 {
+        //                   value: 10,
+        //                   size: "15px"
+        //                 }
+        //               ]
+        //           }
+        //       ]
+        //   };
+
+                const renderer = {
+                  type: "heatmap",
+                  field: "Precipitation11",
+                  colorStops: [
+                    { color: "rgba(63, 40, 102, 0)", ratio: 0 },
+                    { color: "#472b77", ratio: 0.083 },
+                    { color: "#4e2d87", ratio: 0.166 },
+                    { color: "#563098", ratio: 0.249 },
+                    { color: "#5d32a8", ratio: 0.332 },
+                    { color: "#6735be", ratio: 0.415 },
+                    { color: "#7139d4", ratio: 0.498 },
+                    { color: "#7b3ce9", ratio: 0.581 },
+                    { color: "#853fff", ratio: 0.664 },
+                    { color: "#a46fbf", ratio: 0.747 },
+                    { color: "#c29f80", ratio: 0.83 },
+                    { color: "#e0cf40", ratio: 0.913 },
+                    { color: "#ffff00", ratio: 1 }
+                  ],
+                  maxPixelIntensity: 50,
+                  minPixelIntensity: 0
+                };
+
 
         //Создать стиль отображения полигонов
         const renderer2 = {
@@ -127,7 +148,7 @@
           url: "https://agerasx.github.io/city.geojson",
           title: "City Bashkortostan",
           popupTemplate: template,
-          renderer: renderer
+          renderer: renderer1
         });
 
         const raynlayer = new GeoJSONLayer({
@@ -143,6 +164,7 @@
         // const data = new FeatureLayer({
         //   url: "https://agerasx.github.io/data/data.json"
         // });
+
         function loadLayerWithData(url) {
           Promise.all([
             esriRequest("https://agerasx.github.io/city.geojson", {responseType: "json"}),
@@ -162,17 +184,28 @@
             });
             const blob = new Blob([JSON.stringify(geoJson)], {type: "application/json"});
             const url  = URL.createObjectURL(blob);
-            const layer = new GeoJSONLayer({ url : url, renderer: renderer});
+            const layer = new GeoJSONLayer({ url : url, title: "City Bashkortostan", renderer: renderer});
             map.add(layer);
+            view.ui.add(
+                    new Legend({
+                      view: view,
+                      layerInfos: [{
+                        layer: layer,
+                      }]
+                    }),
+                    "bottom-left"
+            );
           });
+
         }
         loadLayerWithData("https://agerasx.github.io/data/data280420.json")
+
 
 
         //Загрузка карты-подложки
         var map = new Map({
           basemap: "topo",
-          layers: [raynlayer]
+          layers: [citylayer, raynlayer]
         });
 
         //Настройка отображения стартового вида
@@ -183,16 +216,13 @@
           center: [56, 54] // longitude, latitude
         });
 
-
-
-
-
         //Добавление виджета слоев
         view.when(function() {
           var layerList = new LayerList({
             view: view
           });
           view.ui.add(layerList, "top-right");
+
         });
 	  });
     </script>
