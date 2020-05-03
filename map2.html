@@ -38,8 +38,46 @@
 
         //Создать стиль Popup's
         const template = {
-            title: "Населенный пункт",
-            content: "<p> <b> Регион: </b>{A_RGN} </p>  <p> <b> Район: </b> {A_DSTRCT} </p> <b>Нас. пункт: </b>{NAME}"
+            title: "Погода в населенном пункте",
+            content: "<p> <b> Регион: </b>{A_RGN} </p>  " +
+                    "<p> <b> Район: </b> {A_DSTRCT} </p> " +
+                    "<p> <b>Нас. пункт: </b>{NAME} </p>" +
+                    "<p> <b>Погода в 05:00 : </b></p>" +
+                    "<ul>" +
+                    "<li> Температура: {Temperature_05} </li>" +
+                    "<li> Давление: {Pressure_05} </li>" +
+                    "<li> Ветер: {Wind05} </li>" +
+                    "<li> Направление ветра: {Wind_Napravlenie05} </li>" +
+                    "<li> Осадки: {Precipitation05} </li>" +
+                    "<li> Облачность: {Cloud05} </li>" +
+                    "</ul>" +
+                    "<p> <b>Погода в 11:00 : </b></p>" +
+                    "<ul>" +
+                    "<li> Температура: {Temperature_11} </li>" +
+                    "<li> Давление: {Pressure_11} </li>" +
+                    "<li> Ветер: {Wind11} </li>" +
+                    "<li> Направление ветра: {Wind_Napravlenie11} </li>" +
+                    "<li> Осадки: {Precipitation11} </li>" +
+                    "<li> Облачность: {Cloud11} </li>" +
+                    "</ul>" +
+                    "<p> <b>Погода в 17:00 : </b></p>" +
+                    "<ul>" +
+                    "<li> Температура: {Temperature_17} </li>" +
+                    "<li> Давление: {Pressure_17} </li>" +
+                    "<li> Ветер: {Wind17} </li>" +
+                    "<li> Направление ветра: {Wind_Napravlenie17} </li>" +
+                    "<li> Осадки: {Precipitation17} </li>" +
+                    "<li> Облачность: {Cloud17} </li>" +
+                    "</ul>" +
+                    "<p> <b>Погода в 23:00 : </b></p>" +
+                    "<ul>" +
+                    "<li> Температура: {Temperature_23} </li>" +
+                    "<li> Давление: {Pressure_23} </li>" +
+                    "<li> Ветер: {Wind23} </li>" +
+                    "<li> Направление ветра: {Wind_Napravlenie23} </li>" +
+                    "<li> Осадки: {Precipitation23} </li>" +
+                    "<li> Облачность: {Cloud23} </li>" +
+                    "</ul>"
         };
 
                 // const template = {
@@ -48,7 +86,7 @@
                 // };
 
           //Создать стиль отображения точек по населению
-          const renderer1 = {
+          const rendererCity = {
               type: "simple",
               symbol: {
                   type: "simple-marker",
@@ -110,7 +148,7 @@
 
                 const renderer = {
                   type: "heatmap",
-                  field: "Precipitation11",
+                  field: "Temperature_17",
                   colorStops: [
                     { color: "rgba(63, 40, 102, 0)", ratio: 0 },
                     { color: "#472b77", ratio: 0.083 },
@@ -132,7 +170,7 @@
 
 
         //Создать стиль отображения полигонов
-        const renderer2 = {
+        const rendererRayn = {
           type: "simple",
           symbol: {
             type: "simple-fill",
@@ -144,26 +182,21 @@
         };
 
         //Загрузка слоев с применением стилей
-        const citylayer = new GeoJSONLayer({
-          url: "https://agerasx.github.io/city.geojson",
-          title: "City Bashkortostan",
-          popupTemplate: template,
-          renderer: renderer1
-        });
+        // const citylayer = new GeoJSONLayer({
+        //   url: "https://agerasx.github.io/city.geojson",
+        //   title: "City Bashkortostan",
+        //   popupTemplate: template,
+        //   renderer: renderer1
+        // });
 
         const raynlayer = new GeoJSONLayer({
             url: "https://agerasx.github.io/rayn.geojson",
             title: "Rayons",
-            renderer: renderer2
+            renderer: rendererRayn
         });
 
         //Прозрачность слоя 50%
         raynlayer.opacity = 0.5;
-
-        //Пробую загрузить данные
-        // const data = new FeatureLayer({
-        //   url: "https://agerasx.github.io/data/data.json"
-        // });
 
         function loadLayerWithData(url) {
           Promise.all([
@@ -184,7 +217,7 @@
             });
             const blob = new Blob([JSON.stringify(geoJson)], {type: "application/json"});
             const url  = URL.createObjectURL(blob);
-            const layer = new GeoJSONLayer({ url : url, title: "City Bashkortostan", renderer: renderer});
+            const layer = new GeoJSONLayer({ url : url, title: "Data", renderer: renderer});
             map.add(layer);
             view.ui.add(
                     new Legend({
@@ -195,6 +228,13 @@
                     }),
                     "bottom-left"
             );
+            const citylayer = new GeoJSONLayer({
+              url: url,
+              title: "City Bashkortostan",
+              popupTemplate: template,
+              renderer: rendererCity
+            });
+            map.add(citylayer);
           });
 
         }
@@ -205,7 +245,7 @@
         //Загрузка карты-подложки
         var map = new Map({
           basemap: "topo",
-          layers: [citylayer, raynlayer]
+          layers: [raynlayer]
         });
 
         //Настройка отображения стартового вида
