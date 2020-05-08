@@ -152,7 +152,7 @@
 
                 const renderer = {
                   type: "heatmap",
-                  field: "Temperature_17",
+                  field: "NAME",
                   colorStops: [
                     { color: "rgba(63, 40, 102, 0)", ratio: 0 },
                     { color: "#472b77", ratio: 0.083 },
@@ -168,7 +168,7 @@
                     { color: "#e0cf40", ratio: 0.913 },
                     { color: "#ffff00", ratio: 1 }
                   ],
-                  maxPixelIntensity: 500,
+                  maxPixelIntensity: 50,
                   minPixelIntensity: 0
                 };
 
@@ -222,6 +222,7 @@
             const blob = new Blob([JSON.stringify(geoJson)], {type: "application/json"});
             const url  = URL.createObjectURL(blob);
             const layer = new GeoJSONLayer({ url : url, title: "Data", renderer: renderer});
+            console.log(url);
             map.add(layer);
             view.ui.add(
                     new Legend({
