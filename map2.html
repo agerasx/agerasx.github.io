@@ -107,11 +107,11 @@
                           },
                           {
                             value: 30000,
-                            size: "8px"
+                            size: "7px"
                           },
                           {
                               value: 100000,
-                              size: "16px"
+                              size: "12px"
                           }
                       ]
                   }
@@ -204,7 +204,7 @@
 
         function loadLayerWithData(url) {
           Promise.all([
-            esriRequest("https://agerasx.github.io/cityedit.geojson", {responseType: "json"}),
+            esriRequest("https://agerasx.github.io/cityeditbash.geojson", {responseType: "json"}),
             esriRequest(url, {responseType: "json"}),
           ]).then(function(responses){
             var geoJson = responses[0].data;
