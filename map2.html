@@ -204,7 +204,7 @@
 
         function loadLayerWithData(url) {
           Promise.all([
-            esriRequest("https://agerasx.github.io/cityed.geojson", {responseType: "json"}),
+            esriRequest("https://agerasx.github.io/cityedit.geojson", {responseType: "json"}),
             esriRequest(url, {responseType: "json"}),
           ]).then(function(responses){
             var geoJson = responses[0].data;
@@ -221,8 +221,7 @@
             });
             const blob = new Blob([JSON.stringify(geoJson)], {type: "application/json"});
             const url  = URL.createObjectURL(blob);
-            const layer = new GeoJSONLayer({ url : url, title: "Data", renderer: renderer, fields: ["NAME"]});
-            document.getElementById("blob").setAttribute("href",url);
+            const layer = new GeoJSONLayer({ url : url, title: "Data", renderer: renderer});
             map.add(layer);
             view.ui.add(
                     new Legend({
@@ -274,7 +273,6 @@
   </head>
 
   <body>
-  <a id="blob">hyu</a>
     <div id="viewDiv"></div>
   </body>
 </html>
