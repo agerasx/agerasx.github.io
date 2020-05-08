@@ -106,8 +106,12 @@
                               size: "4px"
                           },
                           {
+                            value: 30000,
+                            size: "8px"
+                          },
+                          {
                               value: 100000,
-                              size: "10px"
+                              size: "16px"
                           }
                       ]
                   }
@@ -164,7 +168,7 @@
                     { color: "#e0cf40", ratio: 0.913 },
                     { color: "#ffff00", ratio: 1 }
                   ],
-                  maxPixelIntensity: 50,
+                  maxPixelIntensity: 500,
                   minPixelIntensity: 0
                 };
 
@@ -200,7 +204,7 @@
 
         function loadLayerWithData(url) {
           Promise.all([
-            esriRequest("https://agerasx.github.io/city.geojson", {responseType: "json"}),
+            esriRequest("https://agerasx.github.io/cityedit.geojson", {responseType: "json"}),
             esriRequest(url, {responseType: "json"}),
           ]).then(function(responses){
             var geoJson = responses[0].data;
