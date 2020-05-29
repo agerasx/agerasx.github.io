@@ -204,7 +204,7 @@
 
         function loadLayerWithData(url) {
           Promise.all([
-            esriRequest("https://agerasx.github.io/citys.geojson", {responseType: "json"}),
+            esriRequest("https://agerasx.github.io/cityedi.geojson", {responseType: "json"}),
             esriRequest(url, {responseType: "json"}),
           ]).then(function(responses){
             var geoJson = responses[0].data;
